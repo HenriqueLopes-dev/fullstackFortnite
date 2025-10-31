@@ -1,0 +1,30 @@
+services:
+  db:
+    image: postgres:17.5
+    container_name: fortnite-db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: fortnite
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+    volumes:
+      - fortnite-data:/var/lib/postgresql/data
+    networks:
+      - fortnite-network
+
+  adminer:
+    image: adminer:5.3.0
+    container_name: fortnite-adminer
+    ports:
+      - "8081:8080"
+    networks:
+      - fortnite-network
+    depends_on:
+      - db
+
+networks:
+  fortnite-network:
+
+volumes:
+  fortnite-data:
