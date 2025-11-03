@@ -4,11 +4,16 @@ import io.github.HenriqueLopes_dev.dto.user.RegisterUserDTO;
 import io.github.HenriqueLopes_dev.dto.user.UserDTO;
 import io.github.HenriqueLopes_dev.model.Userr;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface UserMapper {
 
     Userr toEntity(RegisterUserDTO dto);
 
-    UserDTO toDTO(Userr user);
+    UserDTO toPrivateDTO(Userr user);
+
+    @Mapping(target = "email", ignore = true)
+    @Mapping(target = "balance", ignore = true)
+    UserDTO toPublicDTO(Userr user);
 }

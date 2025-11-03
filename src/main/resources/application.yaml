@@ -4,7 +4,7 @@ spring:
   app:
     url: ${APP_URL:http://localhost:8080/}
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5433/fortnite}
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/fortnite}
     username: ${DB_USERNAME:admin}
     password: ${DB_PASSWORD:admin}
     driver-class-name: org.postgresql.Driver

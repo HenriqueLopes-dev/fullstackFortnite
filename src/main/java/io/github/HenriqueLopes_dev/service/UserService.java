@@ -12,6 +12,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -24,6 +25,11 @@ public class UserService {
 
     public void save(Userr user) {
         validator.validate(user);
+
+        if (user.getRole() == null) {
+            user.setRole("ROLE_USER");
+        }
+
         String password = user.getPassword();
         user.setPassword(encoder.encode(password));
         repository.save(user);
@@ -53,5 +59,23 @@ public class UserService {
         Specification<Userr> specs = Specification.where(null) ;
 
         return repository.findAll(specs, pageable);
+    }
+
+    public Optional<Userr> findByEmail(String email) {
+        return repository.findByEmail(email);
+    }
+
+    public Userr authenticate(String email, String password) {
+        Optional<Userr> usuario = repository.findByEmail(email);
+
+        if (usuario.isEmpty() || !encoder.matches(password, usuario.get().getPassword())) {
+            throw new RuntimeException("Usuário ou senha inválidos");
+        }
+
+        return usuario.get();
+    }
+
+    public void validateReadInfo(Userr user) {
+        validator.validateSameUser(user);
     }
 }
