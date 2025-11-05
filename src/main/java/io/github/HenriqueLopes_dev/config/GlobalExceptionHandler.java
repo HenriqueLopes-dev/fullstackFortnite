@@ -2,6 +2,7 @@ package io.github.HenriqueLopes_dev.config;
 
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.github.HenriqueLopes_dev.dto.error.FieldErrorDTO;
 import io.github.HenriqueLopes_dev.dto.error.ResponseErrorDTO;
 import io.github.HenriqueLopes_dev.exception.DuplicatedRegistryException;
@@ -64,6 +65,18 @@ public class GlobalExceptionHandler {
                 List.of()
         );
     }
+
+    @ExceptionHandler(JsonProcessingException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseErrorDTO handleJsonProcessingException(JsonProcessingException e){
+        return new ResponseErrorDTO(
+                HttpStatus.BAD_REQUEST.value(),
+                "Erro de processamento de JSON!",
+                List.of()
+        );
+    }
+
+
 
     @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)

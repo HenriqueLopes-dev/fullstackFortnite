@@ -4,46 +4,32 @@ import jakarta.persistence.*;
 import lombok.Data;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.util.List;
 import java.util.UUID;
 
 @Entity
 @Table
 @Data
 @EntityListeners(AuditingEntityListener.class)
-public class Cosmetic {
+public class CosmeticBundle {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column
-    private String externalId;
-
-    @Column
     private String name;
 
     @Column
-    private String description;
-
-    @Column
     private String imageUrl;
-
-    @Column
-    private String rarity;
-
-    @Column
-    private String added;
-
-    @Column
-    private boolean isNew;
-
-    @Column
-    boolean onShop;
 
     @Column
     private int regularPrice;
 
     @Column
     private int finalPrice;
+
+    @Column
+    private List<Cosmetic> cosmetics;
 
 }
