@@ -1,9 +1,11 @@
 package io.github.HenriqueLopes_dev.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -17,19 +19,19 @@ public class CosmeticBundle {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column
+    @Column(nullable = false)
     private String name;
 
     @Column
     private String imageUrl;
 
     @Column
-    private int regularPrice;
+    private Integer regularPrice;
 
     @Column
-    private int finalPrice;
+    private Integer finalPrice;
 
-    @Column
-    private List<Cosmetic> cosmetics;
-
+    @OneToMany(mappedBy = "bundle", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JsonManagedReference
+    private List<Cosmetic> cosmetics = new ArrayList<>();
 }

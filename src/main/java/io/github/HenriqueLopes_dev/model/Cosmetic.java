@@ -1,5 +1,6 @@
 package io.github.HenriqueLopes_dev.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -16,17 +17,20 @@ public class Cosmetic {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column
+    @Column(nullable = false, unique = true)
     private String externalId;
 
-    @Column
+    @Column(nullable = false)
     private String name;
 
-    @Column
+    @Column(length = 1000)
     private String description;
 
     @Column
     private String imageUrl;
+
+    @Column
+    private String type;
 
     @Column
     private String rarity;
@@ -34,16 +38,11 @@ public class Cosmetic {
     @Column
     private String added;
 
-    @Column
-    private boolean isNew;
+    @Column(nullable = false)
+    private Boolean isNew = false;
 
-    @Column
-    boolean onShop;
-
-    @Column
-    private int regularPrice;
-
-    @Column
-    private int finalPrice;
-
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "bundle_id")
+    @JsonManagedReference
+    private CosmeticBundle bundle;
 }

@@ -1,15 +1,12 @@
 package io.github.HenriqueLopes_dev.model;
 
-import io.hypersistence.utils.hibernate.type.array.ListArrayType;
 import jakarta.persistence.*;
 import lombok.Data;
-import org.hibernate.annotations.Type;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -38,15 +35,15 @@ public class Userr implements UserDetails {
     @Column
     private int balance = INITIAL_BALANCE;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "userr_adquired_cosmetics",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "cosmetic_id")
     )
-    private List<Cosmetic> adquiredCosmetics;
+    private List<Cosmetic> acquiredCosmetics;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "userr_purchase_history",
             joinColumns = @JoinColumn(name = "user_id"),
