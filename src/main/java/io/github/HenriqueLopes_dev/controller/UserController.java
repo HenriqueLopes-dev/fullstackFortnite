@@ -1,6 +1,7 @@
 package io.github.HenriqueLopes_dev.controller;
 
 import io.github.HenriqueLopes_dev.dto.user.RegisterUserDTO;
+import io.github.HenriqueLopes_dev.dto.user.SearchUserDTO;
 import io.github.HenriqueLopes_dev.dto.user.UserDTO;
 import io.github.HenriqueLopes_dev.mapper.UserMapper;
 import io.github.HenriqueLopes_dev.model.Userr;
@@ -38,7 +39,7 @@ public class UserController implements GenericController {
 
     // FAZER MOSTRAR TODOS OS COSMETICOS Q A PESSOA TEM
     @GetMapping("{id}")
-    public ResponseEntity<UserDTO> read(@PathVariable String id){
+    public ResponseEntity<Object> read(@PathVariable String id){
 
         Optional<Userr> opUser = service.getUser(UUID.fromString(id));
 
@@ -94,7 +95,7 @@ public ResponseEntity<UserDTO> delete(@PathVariable String id){
 }
 
 @GetMapping
-public ResponseEntity<Page<UserDTO>> search(
+public ResponseEntity<Page<SearchUserDTO>> search(
         @RequestParam(value = "page", defaultValue = "0")
         Integer page,
         @RequestParam(value = "page-size", defaultValue = "50")
@@ -103,7 +104,7 @@ public ResponseEntity<Page<UserDTO>> search(
 
     Page<Userr> pageResult = service.search(page, pageSize);
 
-    Page<UserDTO> finalDTO = pageResult.map(mapper::toPublicDTO);
+    Page<SearchUserDTO> finalDTO = pageResult.map(mapper::toPublicDTO);
 
     return ResponseEntity.ok(finalDTO);
 }

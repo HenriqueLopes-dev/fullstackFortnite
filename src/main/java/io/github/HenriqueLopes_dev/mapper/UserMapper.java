@@ -1,6 +1,7 @@
 package io.github.HenriqueLopes_dev.mapper;
 
 import io.github.HenriqueLopes_dev.dto.user.RegisterUserDTO;
+import io.github.HenriqueLopes_dev.dto.user.SearchUserDTO;
 import io.github.HenriqueLopes_dev.dto.user.UserDTO;
 import io.github.HenriqueLopes_dev.model.Userr;
 import org.mapstruct.Mapper;
@@ -13,7 +14,5 @@ public interface UserMapper {
 
     UserDTO toPrivateDTO(Userr user);
 
-    @Mapping(target = "email", ignore = true)
-    @Mapping(target = "balance", ignore = true)
-    UserDTO toPublicDTO(Userr user);
+    SearchUserDTO toPublicDTO(Userr user);
 }

@@ -15,12 +15,12 @@ public interface CosmeticRepository extends JpaRepository<Cosmetic, UUID>, JpaSp
     Optional<Cosmetic> findByExternalId(String externalId);
 
     @Modifying
-    @Query("""
-        UPDATE Cosmetic c
-        SET c.isNew = false,
-            c.bundle = NULL
-    """)
+    @Query(value = "UPDATE cosmetic SET is_new = false", nativeQuery = true)
     void updateAllByDefault();
+
+    @Modifying
+    @Query(value = "TRUNCATE TABLE cosmetic_bundle CASCADE", nativeQuery = true)
+    void clearAllCosmeticBundles();
 
     boolean existsByExternalId(String externalId);
 

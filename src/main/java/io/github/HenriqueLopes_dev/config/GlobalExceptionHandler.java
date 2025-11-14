@@ -6,6 +6,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import io.github.HenriqueLopes_dev.dto.error.FieldErrorDTO;
 import io.github.HenriqueLopes_dev.dto.error.ResponseErrorDTO;
 import io.github.HenriqueLopes_dev.exception.DuplicatedRegistryException;
+import io.github.HenriqueLopes_dev.exception.NotEnoughTokensException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
@@ -50,6 +51,15 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DuplicatedRegistryException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ResponseErrorDTO handleDuplicatedRegistryException(DuplicatedRegistryException e){
+        return new ResponseErrorDTO(
+                HttpStatus.CONFLICT.value(),
+                e.getMessage(),
+                List.of());
+    }
+
+    @ExceptionHandler(NotEnoughTokensException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ResponseErrorDTO handleNotEnoughTokensException(DuplicatedRegistryException e){
         return new ResponseErrorDTO(
                 HttpStatus.CONFLICT.value(),
                 e.getMessage(),

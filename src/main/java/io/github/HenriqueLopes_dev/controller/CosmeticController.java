@@ -1,18 +1,19 @@
 package io.github.HenriqueLopes_dev.controller;
 
+import io.github.HenriqueLopes_dev.dto.cosmetic.CosmeticDTO;
 import io.github.HenriqueLopes_dev.dto.cosmeticBundle.ShopBundleViewDTO;
 import io.github.HenriqueLopes_dev.mapper.CosmeticMapper;
 import io.github.HenriqueLopes_dev.model.Cosmetic;
+import io.github.HenriqueLopes_dev.model.CosmeticBundle;
 import io.github.HenriqueLopes_dev.service.CosmeticService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("cosmetics")
@@ -41,13 +42,36 @@ public class CosmeticController implements GenericController{
             return ResponseEntity.ok(shopPage);
         }
 
-        // comportamento antigo (cosmetics paginados)
         Page<Cosmetic> pageResult = service.search(
                 name, type, rarity, inclusionDate, isNew, onShop, onSale, page, pageSize
         );
         Page<Object> result = pageResult.map(mapper::toDTO);
         return ResponseEntity.ok(result);
 
+    }
+
+    @GetMapping("{externalId}")
+    public ResponseEntity<Object> read(@PathVariable String externalId){
+        Optional<Cosmetic> opCosmetic = service.findByExternalId(externalId);
+
+        if (opCosmetic.isEmpty()){
+            return ResponseEntity.notFound().build();
+        }
+
+        CosmeticDTO dto = mapper.toDTO(opCosmetic.get());
+        return ResponseEntity.ok(dto);
+    }
+
+    @PostMapping("{bundleId}/purchase")
+    public ResponseEntity<Object> purchase(@PathVariable String bundleId){
+
+        Optional<CosmeticBundle> opBundle = service.findBundleById(UUID.fromString(bundleId));
+
+        if (opBundle.isEmpty()){
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.noContent().build();
     }
 
 }

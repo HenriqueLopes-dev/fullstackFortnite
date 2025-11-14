@@ -6,6 +6,7 @@ import io.github.HenriqueLopes_dev.mapper.CosmeticBundleMapper;
 import io.github.HenriqueLopes_dev.mapper.CosmeticMapper;
 import io.github.HenriqueLopes_dev.model.Cosmetic;
 import io.github.HenriqueLopes_dev.model.CosmeticBundle;
+import io.github.HenriqueLopes_dev.model.CosmeticBundleRelation;
 import io.github.HenriqueLopes_dev.repository.CosmeticBundleRepository;
 import io.github.HenriqueLopes_dev.repository.CosmeticRepository;
 import jakarta.transaction.Transactional;
@@ -35,6 +36,7 @@ public class FortniteSyncService {
         System.out.println("[SYNC] Iniciando sincronização Fortnite...");
 
         repository.updateAllByDefault();
+        repository.clearAllCosmeticBundles();
         bundleRepository.deleteAll();
 
         // ===== Base de cosméticos =====
@@ -63,19 +65,29 @@ public class FortniteSyncService {
         List<CosmeticBundleDTO> shopBundlesDTO = apiService.getShopBundles();
 
         for (CosmeticBundleDTO bundleDTO : shopBundlesDTO) {
+            // Cria e salva o bundle
             CosmeticBundle bundle = bundleMapper.toEntity(bundleDTO);
+
+            if (bundle.getFinalPrice() < bundle.getRegularPrice()) bundle.setIsOnSale(true);
+
             bundle = bundleRepository.saveAndFlush(bundle);
 
-            List<Cosmetic> cosmeticsToSave = new ArrayList<>();
+            // Cria os links intermediários
+            List<CosmeticBundleRelation> links = new ArrayList<>();
+
             for (GetCosmeticsOnShopDTO itemDTO : bundleDTO.cosmeticDTOs()) {
                 CosmeticBundle finalBundle = bundle;
                 repository.findByExternalId(itemDTO.externalId()).ifPresent(cosmetic -> {
-                    cosmetic.setBundle(finalBundle);
-                    cosmeticsToSave.add(cosmetic);
+                    CosmeticBundleRelation link = new CosmeticBundleRelation();
+                    link.setBundle(finalBundle);
+                    link.setCosmetic(cosmetic);
+                    links.add(link);
                 });
             }
 
-            repository.saveAllAndFlush(cosmeticsToSave);
+            // Persiste todos os vínculos (bundle–cosmetic)
+            bundle.getCosmetics().addAll(links);
+            bundleRepository.saveAndFlush(bundle);
         }
 
         System.out.println("[SYNC] Concluída às " + LocalDateTime.now());

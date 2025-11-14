@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.Data;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -41,8 +43,6 @@ public class Cosmetic {
     @Column(nullable = false)
     private Boolean isNew = false;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "bundle_id")
-    @JsonManagedReference
-    private CosmeticBundle bundle;
+    @OneToMany(mappedBy = "cosmetic", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CosmeticBundleRelation> bundles = new ArrayList<>();
 }

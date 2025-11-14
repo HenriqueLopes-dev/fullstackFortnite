@@ -13,7 +13,7 @@ import java.util.UUID;
 @Table
 @Data
 @EntityListeners(AuditingEntityListener.class)
-public class CosmeticBundle {
+public class CosmeticBundle{
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -31,7 +31,9 @@ public class CosmeticBundle {
     @Column
     private Integer finalPrice;
 
-    @OneToMany(mappedBy = "bundle", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JsonManagedReference
-    private List<Cosmetic> cosmetics = new ArrayList<>();
+    @Column
+    private Boolean isOnSale = false;
+
+    @OneToMany(mappedBy = "bundle", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CosmeticBundleRelation> cosmetics = new ArrayList<>();
 }

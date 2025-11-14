@@ -37,6 +37,6 @@ public class UserValidator {
                 return;
             }
         }
-        throw new DuplicatedRegistryException("Você não pode acessar es!");
+        throw new DuplicatedRegistryException("Você não pode acessar este conteúdo!");
     }
 }
