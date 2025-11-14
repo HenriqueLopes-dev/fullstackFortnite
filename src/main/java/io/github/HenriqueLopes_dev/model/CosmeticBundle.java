@@ -34,6 +34,6 @@ public class CosmeticBundle{
     @Column
     private Boolean isOnSale = false;
 
-    @OneToMany(mappedBy = "bundle", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "bundle", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<CosmeticBundleRelation> cosmetics = new ArrayList<>();
 }

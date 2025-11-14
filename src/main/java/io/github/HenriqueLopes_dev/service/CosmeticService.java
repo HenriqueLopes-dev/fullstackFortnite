@@ -1,29 +1,23 @@
 package io.github.HenriqueLopes_dev.service;
 
 import io.github.HenriqueLopes_dev.dto.cosmeticBundle.ShopBundleViewDTO;
-import io.github.HenriqueLopes_dev.dto.user.UserDTO;
 import io.github.HenriqueLopes_dev.exception.NotEnoughTokensException;
 import io.github.HenriqueLopes_dev.mapper.CosmeticMapper;
-import io.github.HenriqueLopes_dev.model.Cosmetic;
-import io.github.HenriqueLopes_dev.model.CosmeticBundle;
-import io.github.HenriqueLopes_dev.model.CosmeticBundleRelation;
-import io.github.HenriqueLopes_dev.model.Userr;
+import io.github.HenriqueLopes_dev.model.*;
 import io.github.HenriqueLopes_dev.repository.CosmeticBundleRepository;
 import io.github.HenriqueLopes_dev.repository.CosmeticRepository;
+import io.github.HenriqueLopes_dev.repository.PurchaseHistoryRepository;
 import io.github.HenriqueLopes_dev.repository.UserRepository;
-import io.github.HenriqueLopes_dev.repository.specs.CosmeticSpecs;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.nio.file.AccessDeniedException;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -36,6 +30,7 @@ public class CosmeticService {
     private final CosmeticRepository repository;
     private final CosmeticBundleRepository bundleRepository;
     private final UserRepository userRepository;
+    private final PurchaseHistoryRepository purchaseHistoryRepository;
     private final CosmeticMapper mapper;
 
     public Page<Cosmetic> search(
@@ -170,36 +165,45 @@ public class CosmeticService {
         return repository.findByExternalId(externalId);
     }
 
-    public Optional<CosmeticBundle> findBundleById(UUID bundleId) {
+    public Optional<CosmeticBundle> purchaseBundleById(UUID bundleId) {
         Optional<CosmeticBundle> opBundle = bundleRepository.findById(bundleId);
 
         if (opBundle.isEmpty()){
             return opBundle;
         }
-        
+        CosmeticBundle bundle = opBundle.get();
+
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Userr user = (Userr) auth.getPrincipal();
 
         int balance = user.getBalance();
-        Integer bundlePrice = opBundle.get().getFinalPrice();
+        Integer bundlePrice = bundle.getFinalPrice();
 
         if (balance < bundlePrice){
             throw new NotEnoughTokensException("Você não possui tokens suficientes para comprar este produto!");
         }
 
-        for (CosmeticBundleRelation cosmeticRelation : opBundle.get().getCosmetics()) {
-            Cosmetic cosmetic = cosmeticRelation.getCosmetic();
-            if (!user.getAcquiredCosmetics().contains(cosmetic)) {
-                user.getAcquiredCosmetics().add(cosmetic);
-            }
-            if (!user.getPurchaseHistory().contains(cosmetic)) {
-                user.getPurchaseHistory().add(cosmetic);
-            }
-        }
+        PurchaseHistory pHistory = new PurchaseHistory();
+
+        pHistory.setPrice(bundle.getFinalPrice());
+        pHistory.setBundleImage(bundle.getImageUrl());
+        pHistory.setBundleName(bundle.getName());
+        pHistory.setCosmetics(
+                bundle.getCosmetics().stream()
+                        .map(CosmeticBundleRelation::getCosmetic).toList()
+        );
+
+        user.getPurchaseHistory().add(pHistory);
 
         user.setBalance(balance - bundlePrice);
         userRepository.save(user);
+        purchaseHistoryRepository.save(pHistory);
+
 
         return opBundle;
+    }
+
+    public Optional<CosmeticBundle> findBubleById(UUID bundleId) {
+        return bundleRepository.findByIdWithCosmetics(bundleId);
     }
 }

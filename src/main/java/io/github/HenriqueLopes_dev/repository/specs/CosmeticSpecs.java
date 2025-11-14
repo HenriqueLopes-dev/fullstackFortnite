@@ -7,25 +7,40 @@ import jakarta.persistence.criteria.*;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class CosmeticSpecs {
 
-    public static Specification<Cosmetic> nameLike(String name, boolean onShop) {
+    public static Specification<Cosmetic> nameLike(String name, Boolean onShop) {
         return (root, query, cb) -> {
-            if (name == null || name.isBlank()) return null;
 
-            if (onShop) {
-                Join<Object, Object> bundleJoin = root.join("bundles", JoinType.LEFT).join("bundle", JoinType.LEFT);
+            if (name == null || name.isBlank()) {
+                return null;
+            }
 
-                Predicate nameMatchesCosmetic = cb.like(cb.lower(root.get("name")), "%" + name.toLowerCase() + "%");
-                Predicate nameMatchesBundle = cb.like(cb.lower(bundleJoin.get("name")), "%" + name.toLowerCase() + "%");
+            assert query != null;
+            query.distinct(true);
+
+            Predicate nameMatchesCosmetic =
+                    cb.like(cb.lower(root.get("name")), "%" + name.toLowerCase() + "%");
+
+            if (onShop != null && onShop) {
+                Join<Cosmetic, CosmeticBundleRelation> relationJoin =
+                        root.join("bundles", JoinType.INNER);
+
+                Join<CosmeticBundleRelation, CosmeticBundle> bundleJoin =
+                        relationJoin.join("bundle", JoinType.INNER);
+
+                Predicate nameMatchesBundle =
+                        cb.like(cb.lower(bundleJoin.get("name")), "%" + name.toLowerCase() + "%");
 
                 return cb.or(nameMatchesCosmetic, nameMatchesBundle);
             }
 
-            return cb.like(cb.lower(root.get("name")), "%" + name.toLowerCase() + "%");
+            return nameMatchesCosmetic;
         };
     }
+
 
 
     public static Specification<Cosmetic> typeLike(String type) {
@@ -39,7 +54,12 @@ public class CosmeticSpecs {
     }
 
     public static Specification<Cosmetic> inclusionDateEqual(LocalDate inclusionDate) {
-        return (root, query, cb) -> cb.equal(root.get("added"), inclusionDate);
+        return (root, query, cb) ->
+                cb.between(
+                        root.get("added"),
+                        inclusionDate.atStartOfDay(),
+                        inclusionDate.plusDays(1).atStartOfDay().minusNanos(1)
+                );
     }
 
     public static Specification<Cosmetic> isNewEqual(Boolean isNew) {
@@ -65,29 +85,21 @@ public class CosmeticSpecs {
 
     public static Specification<Cosmetic> onSaleEqual(Boolean onSale) {
         return (root, query, cb) -> {
-            // Se onSale for null, retorna a conjunção (sem filtro)
             if (onSale == null) {
                 return cb.conjunction();
             }
 
-            // 1. Join do Cosmetic para CosmeticBundleRelation (o campo "bundles" no Cosmetic)
             Join<Cosmetic, CosmeticBundleRelation> relationJoin = root.join("bundles", JoinType.INNER);
-
-            // 2. Join do CosmeticBundleRelation para CosmeticBundle (o campo "bundle" no CosmeticBundleRelation)
             Join<CosmeticBundleRelation, CosmeticBundle> bundleJoin = relationJoin.join("bundle", JoinType.INNER);
 
-            // Garante que o resultado da consulta será distinto (evita duplicatas de Cosmetic)
             assert query != null;
             query.distinct(true);
 
-            // Filtra pelo campo "isOnSale" do CosmeticBundle
             if (onSale) {
-                // Se onSale for true, queremos bundles em promoção
                 return cb.isTrue(bundleJoin.get("isOnSale"));
-            } else {
-                // Se onSale for false, queremos bundles que não estão em promoção
-                return cb.isFalse(bundleJoin.get("isOnSale"));
             }
+            return cb.isFalse(bundleJoin.get("isOnSale"));
+
         };
     }
 

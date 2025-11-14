@@ -35,21 +35,8 @@ public class Userr implements UserDetails {
     @Column
     private int balance = INITIAL_BALANCE;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "userr_adquired_cosmetics",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "cosmetic_id")
-    )
-    private List<Cosmetic> acquiredCosmetics;
-
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "userr_purchase_history",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "cosmetic_id")
-    )
-    private List<Cosmetic> purchaseHistory;
+    @OneToMany(fetch = FetchType.EAGER)
+    private List<PurchaseHistory> purchaseHistory;
 
     @Column
     private String role = "ROLE_USER";

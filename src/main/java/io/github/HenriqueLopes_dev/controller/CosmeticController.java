@@ -1,6 +1,7 @@
 package io.github.HenriqueLopes_dev.controller;
 
 import io.github.HenriqueLopes_dev.dto.cosmetic.CosmeticDTO;
+import io.github.HenriqueLopes_dev.dto.cosmeticBundle.ResponseBundleDTO;
 import io.github.HenriqueLopes_dev.dto.cosmeticBundle.ShopBundleViewDTO;
 import io.github.HenriqueLopes_dev.mapper.CosmeticMapper;
 import io.github.HenriqueLopes_dev.model.Cosmetic;
@@ -35,7 +36,7 @@ public class CosmeticController implements GenericController{
             @RequestParam(value = "page", defaultValue = "0") Integer page,
             @RequestParam(value = "page-size", defaultValue = "30") Integer pageSize
     ){
-        if (Boolean.TRUE.equals(onShop)) {
+        if (Boolean.TRUE.equals(onShop) || Boolean.TRUE.equals(onSale)) {
             Page<ShopBundleViewDTO> shopPage = service.getShopBundlesView(
                     name, type, rarity, inclusionDate, isNew, onSale, page, pageSize
             );
@@ -65,7 +66,7 @@ public class CosmeticController implements GenericController{
     @PostMapping("{bundleId}/purchase")
     public ResponseEntity<Object> purchase(@PathVariable String bundleId){
 
-        Optional<CosmeticBundle> opBundle = service.findBundleById(UUID.fromString(bundleId));
+        Optional<CosmeticBundle> opBundle = service.purchaseBundleById(UUID.fromString(bundleId));
 
         if (opBundle.isEmpty()){
             return ResponseEntity.notFound().build();
@@ -74,4 +75,17 @@ public class CosmeticController implements GenericController{
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("{bundleId}/bundle-info")
+    public ResponseEntity<Object> bundleDetails(@PathVariable String bundleId){
+
+        Optional<CosmeticBundle> opBundle = service.findBubleById(UUID.fromString(bundleId));
+
+        if (opBundle.isEmpty()){
+            return ResponseEntity.notFound().build();
+        }
+
+        ResponseBundleDTO dto = mapper.responseBundleToDTO(opBundle.get());
+
+        return ResponseEntity.ok(dto);
+    }
 }

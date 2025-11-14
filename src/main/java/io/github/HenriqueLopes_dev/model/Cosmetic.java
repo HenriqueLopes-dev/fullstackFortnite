@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -38,7 +39,7 @@ public class Cosmetic {
     private String rarity;
 
     @Column
-    private String added;
+    private LocalDateTime added;
 
     @Column(nullable = false)
     private Boolean isNew = false;

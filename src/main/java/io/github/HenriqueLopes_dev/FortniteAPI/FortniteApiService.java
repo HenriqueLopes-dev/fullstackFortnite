@@ -11,6 +11,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,7 +45,9 @@ public class FortniteApiService {
                     node.path("description").asText(),
                     node.path("images").path("smallIcon").asText(),
                     node.path("rarity").path("value").asText(),
-                    node.path("added").asText(),
+                    Instant.parse(node.path("added").asText())
+                            .atZone(ZoneId.systemDefault())
+                            .toLocalDateTime(),
                     node.path("type").path("value").asText(),
                     false
             ));

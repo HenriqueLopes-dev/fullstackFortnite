@@ -1,6 +1,8 @@
 package io.github.HenriqueLopes_dev.service;
 
+import io.github.HenriqueLopes_dev.model.PurchaseHistory;
 import io.github.HenriqueLopes_dev.model.Userr;
+import io.github.HenriqueLopes_dev.repository.PurchaseHistoryRepository;
 import io.github.HenriqueLopes_dev.repository.UserRepository;
 import io.github.HenriqueLopes_dev.validator.UserValidator;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +14,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -19,6 +22,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository repository;
+    private final PurchaseHistoryRepository pHRepository;
     private final UserValidator validator;
     private final PasswordEncoder encoder;
 
@@ -76,5 +80,14 @@ public class UserService {
 
     public void validateReadInfo(Userr user) {
         validator.validateSameUser(user);
+    }
+
+    public List<PurchaseHistory> filterByNotIsRefound(Userr targetUser) {
+        return targetUser.getPurchaseHistory().stream().map(c -> {
+            if (!c.isRefound()){
+                return c;
+            }
+            return null;
+        }).toList();
     }
 }

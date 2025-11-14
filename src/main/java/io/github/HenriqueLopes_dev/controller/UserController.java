@@ -1,9 +1,11 @@
 package io.github.HenriqueLopes_dev.controller;
 
+import io.github.HenriqueLopes_dev.dto.PurchaseHistoryDTO;
 import io.github.HenriqueLopes_dev.dto.user.RegisterUserDTO;
 import io.github.HenriqueLopes_dev.dto.user.SearchUserDTO;
 import io.github.HenriqueLopes_dev.dto.user.UserDTO;
 import io.github.HenriqueLopes_dev.mapper.UserMapper;
+import io.github.HenriqueLopes_dev.model.PurchaseHistory;
 import io.github.HenriqueLopes_dev.model.Userr;
 import io.github.HenriqueLopes_dev.service.UserService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -15,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -37,7 +40,6 @@ public class UserController implements GenericController {
         return ResponseEntity.created(uri).build();
     }
 
-    // FAZER MOSTRAR TODOS OS COSMETICOS Q A PESSOA TEM
     @GetMapping("{id}")
     public ResponseEntity<Object> read(@PathVariable String id){
 
@@ -108,5 +110,43 @@ public ResponseEntity<Page<SearchUserDTO>> search(
 
     return ResponseEntity.ok(finalDTO);
 }
+
+    @GetMapping("{id}/purchase-history")
+    public ResponseEntity<List<PurchaseHistoryDTO>> getPurchaseHistory(@PathVariable String id){
+
+        Optional<Userr> opUser = service.getUser(UUID.fromString(id));
+
+        if (opUser.isEmpty()){
+            return ResponseEntity.notFound().build();
+        }
+
+        Userr targetUser = opUser.get();
+
+        if (isOwner(targetUser.getId())) {
+            return ResponseEntity.ok(mapper.toDTO(targetUser.getPurchaseHistory()));
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("{id}/acquired-cosmetics")
+    public ResponseEntity<List<PurchaseHistoryDTO>> getAcquiredCosmetics(@PathVariable String id){
+
+        Optional<Userr> opUser = service.getUser(UUID.fromString(id));
+
+        if (opUser.isEmpty()){
+            return ResponseEntity.notFound().build();
+        }
+
+        Userr targetUser = opUser.get();
+
+        if (isOwner(targetUser.getId())) {
+            List<PurchaseHistory> acquiredCosmetics = service.filterByNotIsRefound(targetUser);
+            List<PurchaseHistoryDTO> dto = mapper.toDTO(acquiredCosmetics);
+            return ResponseEntity.ok(dto);
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+
 
 }
