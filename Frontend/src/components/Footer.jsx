@@ -29,7 +29,7 @@ export const Footer = () => (
             </li>
             <li>
               <a
-                href="/usuarios"
+                href="/users"
                 className="text-dark text-decoration-none text-muted hover-text-dark"
               >
                 Usuários
