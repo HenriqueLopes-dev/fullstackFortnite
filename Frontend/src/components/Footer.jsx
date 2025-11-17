@@ -29,18 +29,10 @@ export const Footer = () => (
             </li>
             <li>
               <a
-                href="/sobre"
+                href="/usuarios"
                 className="text-dark text-decoration-none text-muted hover-text-dark"
               >
-                Sobre
-              </a>
-            </li>
-            <li>
-              <a
-                href="/contato"
-                className="text-dark text-decoration-none text-muted hover-text-dark"
-              >
-                Contato
+                Usuários
               </a>
             </li>
           </ul>
