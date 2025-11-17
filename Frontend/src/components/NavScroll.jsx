@@ -44,7 +44,6 @@ export const NavScroll = () => {
           </Nav>
 
           <div className="d-flex align-items-center">
-            {/* Balance separado */}
             {user && (
               <div className="text-warning bg-warning bg-opacity-25 rounded px-3 py-2 border border-warning me-5">
                 <span className="fw-bold text-dark">
@@ -54,7 +53,6 @@ export const NavScroll = () => {
               </div>
             )}
 
-            {/* Dropdown do Perfil completamente separado */}
             {user ? (
               <NavDropdown
                 title={

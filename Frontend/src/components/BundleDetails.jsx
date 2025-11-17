@@ -65,7 +65,6 @@ export const BundleDetails = () => {
     ? Math.round((1 - bundle.finalPrice / bundle.regularPrice) * 100)
     : 0;
 
-  // Verifica se o usuário pode comprar
   const canAfford = user ? user.balance >= (bundle?.finalPrice || 0) : false;
 
   if (loading) {
@@ -120,7 +119,6 @@ export const BundleDetails = () => {
       </button>
 
       <div className="row">
-        {/* Imagem do Bundle - Lado Esquerdo */}
         <div className="col-lg-6 mb-4">
           <div className="card border-0 shadow-lg">
             <div
@@ -147,7 +145,6 @@ export const BundleDetails = () => {
               </div>
             </div>
 
-            {/* Badges na parte inferior da imagem */}
             <div className="card-footer bg-transparent border-0 pt-0">
               <div className="d-flex justify-content-between align-items-center">
                 {hasDiscount && (
@@ -160,7 +157,6 @@ export const BundleDetails = () => {
           </div>
         </div>
 
-        {/* Informações do Bundle - Lado Direito */}
         <div className="col-lg-6 mb-4">
           <div className="card border-0 shadow-lg h-100">
             <div className="card-body d-flex flex-column p-4">
@@ -168,7 +164,6 @@ export const BundleDetails = () => {
                 {bundleName}
               </h1>
 
-              {/* Preços Destaque */}
               <div className="mb-4">
                 {hasDiscount ? (
                   <div className="d-flex align-items-center flex-wrap">
@@ -186,7 +181,6 @@ export const BundleDetails = () => {
                 )}
               </div>
 
-              {/* Botão de Compra Principal */}
               <button
                 className={`btn ${
                   canAfford ? "btn-primary" : "btn-secondary"
@@ -204,7 +198,6 @@ export const BundleDetails = () => {
                   : "V-Bucks Insuficientes"}
               </button>
 
-              {/* Informações Adicionais */}
               <div className="border-top pt-4 mt-auto">
                 <h5 className="fw-bold mb-3">Sobre este Bundle</h5>
 
@@ -241,7 +234,6 @@ export const BundleDetails = () => {
         </div>
       </div>
 
-      {/* Lista de Cosméticos do Bundle */}
       <div className="row mt-2">
         <div className="col-12">
           <div className="card border-0 shadow-lg">
@@ -303,7 +295,6 @@ export const BundleDetails = () => {
                             />
                           </div>
 
-                          {/* Informações do Cosmético */}
                           <div className="flex-grow-1 p-3">
                             <h6 className="fw-bold mb-1 text-truncate">
                               {cosmetic.name}
@@ -357,7 +348,6 @@ export const BundleDetails = () => {
         </div>
       </div>
 
-      {/* Call to Action Final */}
       <div className="row mt-5">
         <div className="col-12">
           <div

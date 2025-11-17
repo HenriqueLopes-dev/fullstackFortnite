@@ -109,7 +109,6 @@ export const BundleHistoryDetails = () => {
       </Button>
 
       <div className="row">
-        {/* Imagem do Bundle - Lado Esquerdo */}
         <div className="col-lg-6 mb-4">
           <Card className="border-0 shadow-lg">
             <div
@@ -133,7 +132,6 @@ export const BundleHistoryDetails = () => {
               />
             </div>
 
-            {/* Informações de compra */}
             <Card.Footer className="bg-transparent border-0 pt-0">
               <div className="d-flex justify-content-between align-items-center">
                 <Badge bg="success" className="fs-6 px-3 py-2">
@@ -195,7 +193,6 @@ export const BundleHistoryDetails = () => {
         </div>
       </div>
 
-      {/* Lista de Cosméticos do Bundle */}
       <div className="row mt-2">
         <div className="col-12">
           <Card className="border-0 shadow-lg">
@@ -227,7 +224,6 @@ export const BundleHistoryDetails = () => {
                     >
                       <Card.Body className="p-0">
                         <div className="d-flex">
-                          {/* Imagem do Cosmético */}
                           <div
                             className="d-flex align-items-center justify-content-center p-3"
                             style={{
@@ -257,7 +253,6 @@ export const BundleHistoryDetails = () => {
                             />
                           </div>
 
-                          {/* Informações do Cosmético */}
                           <div className="flex-grow-1 p-3">
                             <h6 className="fw-bold mb-1 text-truncate">
                               {cosmetic.name}

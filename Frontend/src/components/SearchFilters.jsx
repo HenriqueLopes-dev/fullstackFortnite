@@ -30,7 +30,6 @@ export const SearchFilters = ({ onApply }) => {
   }
 
   function handleApply() {
-    // Converte os valores booleanos para string vazia quando false
     const filtersToApply = {
       ...filters,
       new: filters["new"] ? "true" : "",
@@ -45,7 +44,6 @@ export const SearchFilters = ({ onApply }) => {
       <h5 className="mb-3">Filtros de Cosméticos</h5>
 
       <div className="row g-3">
-        {/* Nome */}
         <div className="col-md-4">
           <label className="form-label">Nome</label>
           <input
@@ -57,7 +55,6 @@ export const SearchFilters = ({ onApply }) => {
           />
         </div>
 
-        {/* Tipo */}
         <div className="col-md-4">
           <label className="form-label">Tipo</label>
           <select
@@ -75,7 +72,6 @@ export const SearchFilters = ({ onApply }) => {
           </select>
         </div>
 
-        {/* Raridade */}
         <div className="col-md-4">
           <label className="form-label">Raridade</label>
           <select
@@ -92,7 +88,6 @@ export const SearchFilters = ({ onApply }) => {
           </select>
         </div>
 
-        {/* Data de Inclusão */}
         <div className="col-md-6">
           <label className="form-label">Data de Inclusão</label>
           <input
@@ -103,7 +98,6 @@ export const SearchFilters = ({ onApply }) => {
           />
         </div>
 
-        {/* Checkboxes */}
         <div className="col-12 mt-3">
           <div className="form-check mb-2 ml-2 text-start">
             <input
@@ -145,7 +139,6 @@ export const SearchFilters = ({ onApply }) => {
           </div>
         </div>
 
-        {/* Botões */}
         <div className="col-12 mt-3 d-flex gap-2">
           <button className="btn btn-primary" onClick={handleApply}>
             Aplicar Filtros

@@ -10,7 +10,6 @@ export const Login = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // Auto focus no campo email
   useEffect(() => {
     document.getElementById("email")?.focus();
   }, []);
@@ -26,7 +25,6 @@ export const Login = () => {
         password,
       });
 
-      // Nenhum token é manipulado aqui — o cookie chega automaticamente
       setMessage("Login realizado com sucesso! Redirecionando...");
 
       setTimeout(() => {

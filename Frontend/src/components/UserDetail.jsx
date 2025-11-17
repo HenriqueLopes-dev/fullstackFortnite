@@ -55,7 +55,6 @@ export const UserDetail = () => {
     }
   };
 
-  // Função para cor da raridade
   const getRarityColor = (rarity) => {
     const colors = {
       common: "secondary",
@@ -71,14 +70,12 @@ export const UserDetail = () => {
     return colors[rarity?.toLowerCase()] || "secondary";
   };
 
-  // Função para formatar data
   const formatDate = (dateString) => {
     if (!dateString) return "-";
     const date = new Date(dateString);
     return date.toLocaleDateString("pt-BR");
   };
 
-  // Renderiza card de bundle no estilo da loja
   const renderBundleCard = (bundle) => {
     const bundleName = bundle.bundleName || "Bundle";
     const bundleImage =
@@ -86,12 +83,11 @@ export const UserDetail = () => {
       (bundle.cosmetics && bundle.cosmetics[0]?.imageUrl) ||
       "https://via.placeholder.com/80x80/ffffff/667eea?text=🎮";
 
-    const hasDiscount = false; // No histórico não tem desconto
+    const hasDiscount = false;
 
     return (
       <div key={bundle.id} className="col-md-6 col-lg-4 mb-4">
         <Card className="h-100 shadow">
-          {/* Container da imagem igual aos cosméticos */}
           <div
             className="d-flex justify-content-center align-items-center p-3 position-relative cursor-pointer"
             style={{
@@ -133,7 +129,6 @@ export const UserDetail = () => {
               }}
             />
 
-            {/* Badges */}
             <Badge className="position-absolute top-0 start-0 bg-dark m-2 small">
               {bundle.cosmetics?.length || 0}
             </Badge>
@@ -217,7 +212,6 @@ export const UserDetail = () => {
     );
   }
 
-  // Calcula total de cosméticos em todos os bundles
   const totalCosmetics = bundles.content.reduce((total, bundle) => {
     return total + (bundle.cosmetics?.length || 0);
   }, 0);
@@ -234,7 +228,6 @@ export const UserDetail = () => {
             ← Voltar para Lista
           </Button>
 
-          {/* Informações do Usuário */}
           <Card className="shadow mb-4">
             <Card.Body className="p-4">
               <Row className="align-items-center">
@@ -289,7 +282,6 @@ export const UserDetail = () => {
             </Card.Body>
           </Card>
 
-          {/* Bundles Adquiridos */}
           <Card className="shadow">
             <Card.Header className="bg-white">
               <h4 className="mb-0 fw-bold">Bundles Adquiridos</h4>

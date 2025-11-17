@@ -9,7 +9,6 @@ export const Home = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  // Parâmetros de filtro da URL
   const name = searchParams.get("name") || "";
   const type = searchParams.get("type") || "";
   const rarity = searchParams.get("rarity") || "";
@@ -20,7 +19,6 @@ export const Home = () => {
   const page = parseInt(searchParams.get("page") || "0", 10);
   const pageSize = parseInt(searchParams.get("page-size") || "20", 10);
 
-  // Verifica se está em modo bundle (shop ou sale ativos)
   const isBundleMode = shop || sale;
 
   async function applyFilters(filters = {}) {
@@ -28,7 +26,6 @@ export const Home = () => {
     try {
       const params = new URLSearchParams();
 
-      // Adiciona todos os filtros aos parâmetros
       if (name) params.append("name", name);
       if (type) params.append("type", type);
       if (rarity) params.append("rarity", rarity);
@@ -37,7 +34,6 @@ export const Home = () => {
       if (shop) params.append("shop", shop);
       if (sale) params.append("sale", sale);
 
-      // Parâmetros de paginação
       params.append("page", String(page));
       params.append("page-size", String(pageSize));
 
@@ -53,18 +49,15 @@ export const Home = () => {
   }
 
   useEffect(() => {
-    // Aplica filtros quando os parâmetros da URL mudam
     applyFilters({ name, type, rarity, inclusionDate, isNew, shop, sale });
   }, [name, type, rarity, inclusionDate, isNew, shop, sale, page, pageSize]);
 
-  // Atualiza a página na URL
   const handlePageChange = (newPage) => {
     const next = new URLSearchParams(searchParams);
     next.set("page", String(newPage));
     setSearchParams(next);
   };
 
-  // Função para cor da raridade
   const getRarityColor = (rarity) => {
     const colors = {
       common: "secondary",
@@ -80,14 +73,12 @@ export const Home = () => {
     return colors[rarity?.toLowerCase()] || "secondary";
   };
 
-  // Função para formatar data
   const formatDate = (dateString) => {
     if (!dateString) return "-";
     const date = new Date(dateString);
     return date.toLocaleDateString("pt-BR");
   };
 
-  // Renderiza card de cosmético individual
   const renderCosmeticCard = (cos) => (
     <div key={cos.id || cos.externalId} className="col-md-6 col-lg-4 mb-3">
       <div
@@ -156,7 +147,6 @@ export const Home = () => {
     </div>
   );
 
-  // Renderiza card de bundle - Versão Minimalista
   const renderBundleCard = (bundle) => {
     const bundleName =
       bundle.bundleName ||
@@ -177,7 +167,6 @@ export const Home = () => {
     return (
       <div key={bundle.bundleId} className="col-md-6 col-lg-4 mb-3">
         <div className="card h-100">
-          {/* Container da imagem igual aos cosméticos */}
           <div
             className="d-flex justify-content-center align-items-center p-3 position-relative cursor-pointer"
             style={{
@@ -217,7 +206,6 @@ export const Home = () => {
               }}
             />
 
-            {/* Badges */}
             <span className="position-absolute top-0 start-0 badge bg-dark m-2 small">
               {bundle.cosmetics?.length || 0}
             </span>
@@ -260,10 +248,8 @@ export const Home = () => {
     );
   };
 
-  // Detecta se o item é um bundle ou cosmético individual
   const isBundle = (item) => item.bundleId !== undefined;
 
-  // Paginação inteligente - mostra apenas páginas próximas
   const renderPaginationButtons = () => {
     if (!cosmetics.page || cosmetics.page.totalPages <= 1) return null;
 
@@ -271,7 +257,6 @@ export const Home = () => {
     const currentPage = page;
     const buttons = [];
 
-    // Botão Anterior
     buttons.push(
       <button
         key="prev"
@@ -285,7 +270,6 @@ export const Home = () => {
       </button>
     );
 
-    // Primeira página
     if (currentPage > 2) {
       buttons.push(
         <button
@@ -305,7 +289,6 @@ export const Home = () => {
       }
     }
 
-    // Páginas ao redor da atual
     for (
       let i = Math.max(0, currentPage - 2);
       i <= Math.min(totalPages - 1, currentPage + 2);
@@ -324,7 +307,6 @@ export const Home = () => {
       );
     }
 
-    // Última página
     if (currentPage < totalPages - 3) {
       if (currentPage < totalPages - 4) {
         buttons.push(
@@ -344,7 +326,6 @@ export const Home = () => {
       );
     }
 
-    // Botão Próxima
     buttons.push(
       <button
         key="next"
@@ -375,12 +356,11 @@ export const Home = () => {
           Object.entries(filters).forEach(([key, value]) => {
             if (value) next.set(key, value);
           });
-          next.set("page", "0"); // Reset para primeira página
+          next.set("page", "0");
           setSearchParams(next);
         }}
       />
 
-      {/* Resultados */}
       <div className="mt-4">
         {loading ? (
           <div className="d-flex justify-content-center">
@@ -396,7 +376,6 @@ export const Home = () => {
           </p>
         ) : (
           <>
-            {/* Informações da página */}
             <div className="row mb-3">
               <div className="col">
                 <small className="text-muted">
@@ -413,7 +392,6 @@ export const Home = () => {
               </div>
             </div>
 
-            {/* Grid dinâmico - bundles ou cosméticos */}
             <div className="row">
               {cosmetics.content.map((item) =>
                 isBundle(item)
@@ -422,7 +400,6 @@ export const Home = () => {
               )}
             </div>
 
-            {/* Paginação com Bootstrap - Versão inteligente */}
             {cosmetics.page && cosmetics.page.totalPages > 1 && (
               <div className="d-flex justify-content-center align-items-center gap-2 mt-4 flex-wrap">
                 {renderPaginationButtons()}

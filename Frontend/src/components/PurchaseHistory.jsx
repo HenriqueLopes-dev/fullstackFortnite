@@ -53,7 +53,6 @@ export const PurchaseHistory = () => {
     try {
       await api.post(`/users/me/acquired-cosmetics/${bundleId}/refund`);
 
-      // Atualiza o bundle para refund: true
       setBundles((prev) => ({
         ...prev,
         content: prev.content.map((bundle) =>
@@ -67,14 +66,12 @@ export const PurchaseHistory = () => {
     }
   };
 
-  // Função para formatar data
   const formatDate = (dateString) => {
     if (!dateString) return "-";
     const date = new Date(dateString);
     return date.toLocaleDateString("pt-BR");
   };
 
-  // Renderiza card de bundle
   const renderBundleCard = (bundle) => {
     const bundleName = bundle.bundleName || "Bundle";
     const bundleImage =
@@ -93,7 +90,6 @@ export const PurchaseHistory = () => {
             filter: isRefunded ? "grayscale(50%)" : "none",
           }}
         >
-          {/* Header do Bundle */}
           <div
             className="position-relative"
             style={{
