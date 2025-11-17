@@ -17,6 +17,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -165,40 +166,44 @@ public class CosmeticService {
         return repository.findByExternalId(externalId);
     }
 
+    @Transactional
     public Optional<CosmeticBundle> purchaseBundleById(UUID bundleId) {
-        Optional<CosmeticBundle> opBundle = bundleRepository.findById(bundleId);
 
-        if (opBundle.isEmpty()){
-            return opBundle;
+        Optional<CosmeticBundle> opBundle = bundleRepository.findById(bundleId);
+        if (opBundle.isEmpty()) {
+            return Optional.empty();
         }
+
         CosmeticBundle bundle = opBundle.get();
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Userr user = (Userr) auth.getPrincipal();
 
-        int balance = user.getBalance();
-        Integer bundlePrice = bundle.getFinalPrice();
+        user = userRepository.findById(user.getId()).orElseThrow();
 
-        if (balance < bundlePrice){
-            throw new NotEnoughTokensException("Você não possui tokens suficientes para comprar este produto!");
+        if (user.getBalance() < bundle.getFinalPrice()) {
+            throw new NotEnoughTokensException("Você não possui tokens suficientes!");
         }
 
-        PurchaseHistory pHistory = new PurchaseHistory();
+        PurchaseHistory purchase = new PurchaseHistory();
+        purchase.setPrice(bundle.getFinalPrice());
+        purchase.setBundleImage(bundle.getImageUrl());
+        purchase.setBundleName(bundle.getName());
+        purchase.setUser(user);
 
-        pHistory.setPrice(bundle.getFinalPrice());
-        pHistory.setBundleImage(bundle.getImageUrl());
-        pHistory.setBundleName(bundle.getName());
-        pHistory.setCosmetics(
-                bundle.getCosmetics().stream()
-                        .map(CosmeticBundleRelation::getCosmetic).toList()
-        );
+        List<Cosmetic> cosmetics = bundle.getCosmetics().stream()
+                .map(CosmeticBundleRelation::getCosmetic)
+                .toList();
+        purchase.setCosmetics(cosmetics);
 
-        user.getPurchaseHistory().add(pHistory);
+        user.setBalance(user.getBalance() - bundle.getFinalPrice());
 
-        user.setBalance(balance - bundlePrice);
+        if (user.getPurchaseHistory() == null) {
+            user.setPurchaseHistory(new ArrayList<>());
+        }
+        user.getPurchaseHistory().add(purchase);
+
         userRepository.save(user);
-        purchaseHistoryRepository.save(pHistory);
-
 
         return opBundle;
     }

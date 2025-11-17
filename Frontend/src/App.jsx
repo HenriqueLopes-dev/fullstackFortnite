@@ -11,6 +11,11 @@ import { Home } from "./components/Home";
 import { BundleDetails } from "./components/BundleDetails";
 import { Routes, Route } from "react-router-dom";
 import { Register } from "./components/Register";
+import { CosmeticDetails } from "./components/Cosmetic";
+import { Profile } from "./components/Profile";
+import { UsersList } from "./components/UsersList";
+import { UserDetail } from "./components/UserDetail";
+import { BundleHistoryDetails } from "./components/BundleHistoryDetails";
 
 function App() {
   return (
@@ -22,6 +27,14 @@ function App() {
           <Route path="login" element={<Login />} />
           <Route path="register" element={<Register />} />
           <Route path="bundle/:bundleId" element={<BundleDetails />} />
+          <Route path="cosmetic/:externalId" element={<CosmeticDetails />} />
+          <Route path="user/:id" element={<UserDetail />} />
+          <Route path="users" element={<UsersList />} />
+          <Route path="profile" element={<Profile />} />
+          <Route
+            path="bundle-history/:bundleId"
+            element={<BundleHistoryDetails />}
+          />
         </Routes>
       </main>
       <Footer />

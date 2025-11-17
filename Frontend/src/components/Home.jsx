@@ -90,7 +90,13 @@ export const Home = () => {
   // Renderiza card de cosmético individual
   const renderCosmeticCard = (cos) => (
     <div key={cos.id || cos.externalId} className="col-md-6 col-lg-4 mb-3">
-      <div className="card h-100">
+      <div
+        className="card h-100 "
+        style={{
+          cursor: "pointer",
+        }}
+        onClick={() => navigate(`/cosmetic/${cos.externalId}`)}
+      >
         <div
           className="d-flex justify-content-center align-items-center p-3 position-relative"
           style={{

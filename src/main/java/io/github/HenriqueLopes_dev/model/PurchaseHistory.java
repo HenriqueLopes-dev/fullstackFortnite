@@ -29,11 +29,20 @@ public class PurchaseHistory {
     @Column
     private String bundleImage;
 
-    @OneToMany(fetch = FetchType.EAGER)
-    private List<Cosmetic> cosmetics;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "purchase_history_cosmetics",
+            joinColumns = @JoinColumn(name = "purchase_history_id"),
+            inverseJoinColumns = @JoinColumn(name = "cosmetic_id")
+    )
+    private List<Cosmetic> cosmetics = new ArrayList<>();
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "userr_id")
+    private Userr user;
 
     @Column
-    private boolean isRefound = false;
+    private boolean refund = false;
 
     @Column
     @CreatedDate

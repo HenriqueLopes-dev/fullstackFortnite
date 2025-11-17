@@ -1,20 +1,18 @@
-package io.github.HenriqueLopes_dev.dto;
+package io.github.HenriqueLopes_dev.dto.user;
 
 import io.github.HenriqueLopes_dev.dto.cosmetic.CosmeticDTO;
-import io.github.HenriqueLopes_dev.model.Userr;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-public record PurchaseHistoryDTO(
+public record PurchaseHistoryWithoutUserDTO(
         UUID id,
         Integer price,
         String bundleName,
         String bundleImage,
         List<CosmeticDTO> cosmetics,
-        Userr user,
-        boolean isRefound,
+        boolean refund,
         LocalDateTime createdAt
 ) {
 }

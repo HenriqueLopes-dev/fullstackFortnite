@@ -1,32 +1,10 @@
-import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { api } from "../api/AxiosConfig";
-import { useAuth } from "./AuthContext";
+import React from "react";
+import { useNavigate } from "react-router-dom";
 
-export const BundleDetails = () => {
-  const { bundleId } = useParams();
+export const BundleHistoryDetails = () => {
   const navigate = useNavigate();
-  const { user, purchaseItem } = useAuth();
-  const [bundle, setBundle] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const fetchBundleDetails = async () => {
-      try {
-        setLoading(true);
-        const response = await api.get(`/cosmetics/${bundleId}/bundle-info`);
-        setBundle(response.data);
-      } catch (err) {
-        setError("Erro ao carregar detalhes do bundle");
-        console.error("Erro:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchBundleDetails();
-  }, [bundleId]);
+  const bundle = history.state?.bundle;
 
   const getRarityColor = (rarity) => {
     const colors = {
@@ -45,7 +23,7 @@ export const BundleDetails = () => {
   };
 
   const handleBack = () => {
-    navigate("/");
+    navigate(-1);
   };
 
   const formatDate = (dateString) => {
@@ -54,69 +32,26 @@ export const BundleDetails = () => {
     return date.toLocaleDateString("pt-BR");
   };
 
-  const handlePurchase = () => {
-    if (!bundle) return;
-    api.post(`cosmetics/${bundle.id}/purchase`);
-    window.location.reload(false);
-  };
-
-  const hasDiscount = bundle?.finalPrice < bundle?.regularPrice;
-  const discountPercent = hasDiscount
-    ? Math.round((1 - bundle.finalPrice / bundle.regularPrice) * 100)
-    : 0;
-
-  // Verifica se o usuário pode comprar
-  const canAfford = user ? user.balance >= (bundle?.finalPrice || 0) : false;
-
-  if (loading) {
-    return (
-      <div className="container mt-4">
-        <div className="d-flex justify-content-center py-5">
-          <div
-            className="spinner-border text-primary"
-            style={{ width: "3rem", height: "3rem" }}
-            role="status"
-          >
-            <span className="visually-hidden">Carregando...</span>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="container mt-4">
-        <div className="alert alert-danger d-flex align-items-center">
-          <div className="flex-grow-1">{error}</div>
-          <button className="btn btn-secondary ms-3" onClick={handleBack}>
-            Voltar
-          </button>
-        </div>
-      </div>
-    );
-  }
-
   if (!bundle) {
     return (
       <div className="container mt-4">
         <div className="alert alert-warning text-center py-4">
           <h4>Bundle não encontrado</h4>
           <button className="btn btn-outline-primary mt-2" onClick={handleBack}>
-            ← Voltar para a loja
+            ← Voltar
           </button>
         </div>
       </div>
     );
   }
 
-  const bundleName =
-    bundle.name || bundle.cosmetics?.[0]?.name + " Bundle" || "Bundle";
-  const bundleImage = bundle.imageUrl || bundle.cosmetics?.[0]?.imageUrl;
+  const bundleName = bundle.bundleName || "Bundle";
+  const bundleImage = bundle.bundleImage || bundle.cosmetics?.[0]?.imageUrl;
+
   return (
     <div className="container mt-4">
       <button className="btn btn-outline-secondary mb-4" onClick={handleBack}>
-        ← Voltar para a Loja
+        ← Voltar
       </button>
 
       <div className="row">
@@ -147,14 +82,15 @@ export const BundleDetails = () => {
               </div>
             </div>
 
-            {/* Badges na parte inferior da imagem */}
+            {/* Informações de compra */}
             <div className="card-footer bg-transparent border-0 pt-0">
               <div className="d-flex justify-content-between align-items-center">
-                {hasDiscount && (
-                  <span className="badge bg-danger fs-6 px-3 py-2">
-                    -{discountPercent}% OFF
-                  </span>
-                )}
+                <span className="badge bg-success fs-6 px-3 py-2">
+                  Comprado por {bundle.price} V-Bucks
+                </span>
+                <small className="text-muted">
+                  Em {formatDate(bundle.createdAt)}
+                </small>
               </div>
             </div>
           </div>
@@ -168,45 +104,17 @@ export const BundleDetails = () => {
                 {bundleName}
               </h1>
 
-              {/* Preços Destaque */}
+              {/* Status de compra */}
               <div className="mb-4">
-                {hasDiscount ? (
-                  <div className="d-flex align-items-center flex-wrap">
-                    <span className="text-decoration-line-through text-muted fs-4 me-3">
-                      {bundle.regularPrice} V-Bucks
-                    </span>
-                    <span className="fw-bold text-success display-6 me-3">
-                      {bundle.finalPrice} V-Bucks
-                    </span>
-                  </div>
-                ) : (
-                  <span className="fw-bold display-6 text-dark">
-                    {bundle.finalPrice} V-Bucks
-                  </span>
-                )}
+                <div className="alert alert-success">
+                  <i className="fas fa-check-circle me-2"></i>
+                  <strong>Bundle adquirido com sucesso!</strong>
+                </div>
               </div>
-
-              {/* Botão de Compra Principal */}
-              <button
-                className={`btn ${
-                  canAfford ? "btn-primary" : "btn-secondary"
-                } btn-lg w-100 py-3 mb-4 fw-bold fs-5`}
-                onClick={handlePurchase}
-                disabled={!user || !canAfford}
-                style={{
-                  cursor: user && canAfford ? "pointer" : "not-allowed",
-                }}
-              >
-                {!user
-                  ? "Faça login para comprar"
-                  : canAfford
-                  ? `Comprar`
-                  : "V-Bucks Insuficientes"}
-              </button>
 
               {/* Informações Adicionais */}
               <div className="border-top pt-4 mt-auto">
-                <h5 className="fw-bold mb-3">Sobre este Bundle</h5>
+                <h5 className="fw-bold mb-3">Detalhes da Compra</h5>
 
                 <div className="row text-center">
                   <div className="col-4">
@@ -220,9 +128,9 @@ export const BundleDetails = () => {
                   <div className="col-4">
                     <div className="border-end">
                       <div className="fw-bold text-success fs-4">
-                        {hasDiscount ? discountPercent + "%" : "-"}
+                        {bundle.price}
                       </div>
-                      <small className="text-muted">Desconto</small>
+                      <small className="text-muted">V-Bucks</small>
                     </div>
                   </div>
                   <div className="col-4">
@@ -248,7 +156,7 @@ export const BundleDetails = () => {
             <div className="card-header bg-transparent border-0 py-4">
               <h2 className="mb-0 fw-bold">Itens do Bundle</h2>
               <p className="text-muted mb-0 mt-2">
-                Clique em qualquer item para ver detalhes completos
+                Todos os itens que você adquiriu neste bundle
               </p>
             </div>
             <div className="card-body p-4">
@@ -354,18 +262,6 @@ export const BundleDetails = () => {
               </div>
             </div>
           </div>
-        </div>
-      </div>
-
-      {/* Call to Action Final */}
-      <div className="row mt-5">
-        <div className="col-12">
-          <div
-            className="card border-0 bg-gradient text-white"
-            style={{
-              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-            }}
-          ></div>
         </div>
       </div>
     </div>

@@ -7,6 +7,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -35,8 +36,8 @@ public class Userr implements UserDetails {
     @Column
     private int balance = INITIAL_BALANCE;
 
-    @OneToMany(fetch = FetchType.EAGER)
-    private List<PurchaseHistory> purchaseHistory;
+    @OneToMany(mappedBy = "user",fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PurchaseHistory> purchaseHistory = new ArrayList<>();
 
     @Column
     private String role = "ROLE_USER";

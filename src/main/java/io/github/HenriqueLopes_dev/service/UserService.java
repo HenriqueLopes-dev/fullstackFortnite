@@ -13,6 +13,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -49,7 +50,7 @@ public class UserService {
 
         validator.validate(user);
         String password = user.getPassword();
-        user.setPassword(password);
+        user.setPassword(encoder.encode(password));
         repository.save(user);
     }
 
@@ -58,7 +59,7 @@ public class UserService {
     }
 
     public Page<Userr> search(Integer page, Integer pageSize) {
-        Pageable pageable = PageRequest.of(page, pageSize, Sort.by("id").ascending());
+        Pageable pageable = PageRequest.of(page, pageSize);
         Specification<Userr> specs = Specification.where(null) ;
 
         return repository.findAll(specs, pageable);
@@ -82,12 +83,38 @@ public class UserService {
         validator.validateSameUser(user);
     }
 
-    public List<PurchaseHistory> filterByNotIsRefound(Userr targetUser) {
-        return targetUser.getPurchaseHistory().stream().map(c -> {
-            if (!c.isRefound()){
-                return c;
-            }
-            return null;
-        }).toList();
+    public Page<PurchaseHistory> getPurchaseHistoryByUser(Userr user, Integer page, Integer pageSize) {
+        Pageable pageable = PageRequest.of(page, pageSize, Sort.by("createdAt").descending());
+        return pHRepository.findByUser(user, pageable);
+    }
+
+    public Page<PurchaseHistory> getAcquiredCosmeticsByUser(Userr user, Integer page, Integer pageSize) {
+        Pageable pageable = PageRequest.of(page, pageSize, Sort.by("createdAt").descending());
+        return pHRepository.findByUserAndRefundFalse(user, pageable);
+    }
+
+    public Optional<PurchaseHistory> getPurchaseHistory(UUID id) {
+        return pHRepository.findById(id);
+    }
+
+    @Transactional
+    public void refundPurchase(PurchaseHistory purchaseHistory) {
+        if (purchaseHistory.isRefund()){
+            return;
+        }
+
+        Integer price = purchaseHistory.getPrice();
+        Userr user = purchaseHistory.getUser();
+
+        purchaseHistory.setRefund(true);
+        user.setBalance(user.getBalance() + price);
+
+        repository.save(user);
+        pHRepository.save(purchaseHistory);
+
+    }
+
+    public Optional<PurchaseHistory> getPurchaseHistoryByIdAndUser(UUID id, Userr user) {
+        return pHRepository.findByIdAndUser(id, user);
     }
 }
