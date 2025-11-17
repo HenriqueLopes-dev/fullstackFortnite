@@ -102,7 +102,6 @@ export const CosmeticDetails = () => {
       </button>
 
       <div className="row">
-        {/* Imagem do Cosmético - Lado Esquerdo */}
         <div className="col-lg-6 mb-4">
           <div className="card border-0 shadow-lg">
             <div
@@ -143,7 +142,6 @@ export const CosmeticDetails = () => {
           </div>
         </div>
 
-        {/* Informações do Cosmético - Lado Direito */}
         <div className="col-lg-6 mb-4">
           <div className="card border-0 shadow-lg h-100">
             <div className="card-body d-flex flex-column p-4">
@@ -155,7 +153,6 @@ export const CosmeticDetails = () => {
                 <p className="lead text-muted mb-4">{cosmetic.description}</p>
               )}
 
-              {/* Badges de Informação */}
               <div className="d-flex gap-2 mb-4">
                 <span
                   className={`badge bg-${getRarityColor(cosmetic.rarity)} fs-6`}
@@ -170,9 +167,8 @@ export const CosmeticDetails = () => {
                 )}
               </div>
 
-              {/* Informações Detalhadas */}
               <div className="border-top pt-4 mt-auto">
-                <h5 className="fw-bold mb-3">📋 Detalhes do Cosmético</h5>
+                <h5 className="fw-bold mb-3">Detalhes do Cosmético</h5>
 
                 <div className="row mb-3">
                   <div className="col-6">
@@ -201,21 +197,10 @@ export const CosmeticDetails = () => {
 
                 {cosmetic.isNew && (
                   <div className="alert alert-success mt-3 mb-0">
-                    <strong>✨ Novo Item!</strong> Este cosmético foi adicionado
+                    <strong>Novo Item!</strong> Este cosmético foi adicionado
                     recentemente à loja
                   </div>
                 )}
-              </div>
-
-              {/* Aviso sobre compra em bundles */}
-              <div className="alert alert-info mt-4">
-                <strong>💡 Como obter este cosmético:</strong>
-                <br />
-                <small>
-                  Este item está disponível em diversos bundles da loja. Navegue
-                  pelos bundles para encontrar ofertas que incluam este
-                  cosmético!
-                </small>
               </div>
             </div>
           </div>

@@ -1,10 +1,49 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import {
+  Container,
+  Row,
+  Col,
+  Card,
+  Button,
+  Alert,
+  Spinner,
+  Badge,
+} from "react-bootstrap";
+import { useAuth } from "./AuthContext";
+import api from "../api/AxiosConfig";
 
 export const BundleHistoryDetails = () => {
+  const { bundleId } = useParams();
+  const { user } = useAuth();
   const navigate = useNavigate();
+  const [bundle, setBundle] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const bundle = history.state?.bundle;
+  useEffect(() => {
+    if (user && bundleId) {
+      fetchBundleDetails();
+    }
+  }, [user, bundleId]);
+
+  const fetchBundleDetails = async () => {
+    setLoading(true);
+    setError("");
+
+    try {
+      const response = await api.get(
+        `/users/${user.id}/purchase-history/${bundleId}`
+      );
+      setBundle(response.data);
+    } catch (err) {
+      setError(
+        err.response?.data?.message || "Erro ao carregar detalhes do bundle"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const getRarityColor = (rarity) => {
     const colors = {
@@ -32,16 +71,31 @@ export const BundleHistoryDetails = () => {
     return date.toLocaleDateString("pt-BR");
   };
 
-  if (!bundle) {
+  if (loading) {
     return (
-      <div className="container mt-4">
-        <div className="alert alert-warning text-center py-4">
-          <h4>Bundle não encontrado</h4>
-          <button className="btn btn-outline-primary mt-2" onClick={handleBack}>
-            ← Voltar
-          </button>
+      <Container className="mt-4">
+        <div className="text-center py-5">
+          <Spinner animation="border" role="status" className="text-primary">
+            <span className="visually-hidden">Carregando...</span>
+          </Spinner>
+          <p className="mt-3">Carregando detalhes do bundle...</p>
         </div>
-      </div>
+      </Container>
+    );
+  }
+
+  if (error || !bundle) {
+    return (
+      <Container className="mt-4">
+        <Alert variant="danger">
+          {error || "Bundle não encontrado"}
+          <div className="mt-3">
+            <Button variant="primary" onClick={handleBack}>
+              ← Voltar
+            </Button>
+          </div>
+        </Alert>
+      </Container>
     );
   }
 
@@ -49,70 +103,62 @@ export const BundleHistoryDetails = () => {
   const bundleImage = bundle.bundleImage || bundle.cosmetics?.[0]?.imageUrl;
 
   return (
-    <div className="container mt-4">
-      <button className="btn btn-outline-secondary mb-4" onClick={handleBack}>
+    <Container className="mt-4">
+      <Button variant="outline-secondary mb-4" onClick={handleBack}>
         ← Voltar
-      </button>
+      </Button>
 
       <div className="row">
         {/* Imagem do Bundle - Lado Esquerdo */}
         <div className="col-lg-6 mb-4">
-          <div className="card border-0 shadow-lg">
+          <Card className="border-0 shadow-lg">
             <div
               className="d-flex justify-content-center align-items-center p-5 position-relative"
               style={{
                 background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
               }}
             >
-              <div />
-              <div className="position-relative" style={{ overflow: "hidden" }}>
-                <img
-                  src={bundleImage}
-                  className="img-fluid"
-                  style={{
-                    maxHeight: "500px",
-                  }}
-                  alt={bundleName}
-                  onError={(e) => {
-                    e.target.src =
-                      "https://via.placeholder.com/300x300/ffffff/667eea?text=🎮";
-                    e.target.style.filter = "none";
-                  }}
-                />
-              </div>
+              <img
+                src={bundleImage}
+                className="img-fluid"
+                style={{
+                  maxHeight: "500px",
+                }}
+                alt={bundleName}
+                onError={(e) => {
+                  e.target.src =
+                    "https://via.placeholder.com/300x300/ffffff/667eea?text=🎮";
+                  e.target.style.filter = "none";
+                }}
+              />
             </div>
 
             {/* Informações de compra */}
-            <div className="card-footer bg-transparent border-0 pt-0">
+            <Card.Footer className="bg-transparent border-0 pt-0">
               <div className="d-flex justify-content-between align-items-center">
-                <span className="badge bg-success fs-6 px-3 py-2">
+                <Badge bg="success" className="fs-6 px-3 py-2">
                   Comprado por {bundle.price} V-Bucks
-                </span>
+                </Badge>
                 <small className="text-muted">
                   Em {formatDate(bundle.createdAt)}
                 </small>
               </div>
-            </div>
-          </div>
+              {bundle.refund && (
+                <Badge bg="secondary" className="mt-2">
+                  Reembolsado
+                </Badge>
+              )}
+            </Card.Footer>
+          </Card>
         </div>
 
-        {/* Informações do Bundle - Lado Direito */}
         <div className="col-lg-6 mb-4">
-          <div className="card border-0 shadow-lg h-100">
-            <div className="card-body d-flex flex-column p-4">
+          <Card className="border-0 shadow-lg h-100">
+            <Card.Body className="d-flex flex-column p-4">
               <h1 className="card-title display-6 fw-bold text-dark mb-3">
                 {bundleName}
               </h1>
 
-              {/* Status de compra */}
-              <div className="mb-4">
-                <div className="alert alert-success">
-                  <i className="fas fa-check-circle me-2"></i>
-                  <strong>Bundle adquirido com sucesso!</strong>
-                </div>
-              </div>
-
-              {/* Informações Adicionais */}
               <div className="border-top pt-4 mt-auto">
                 <h5 className="fw-bold mb-3">Detalhes da Compra</h5>
 
@@ -144,27 +190,27 @@ export const BundleHistoryDetails = () => {
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
+            </Card.Body>
+          </Card>
         </div>
       </div>
 
       {/* Lista de Cosméticos do Bundle */}
       <div className="row mt-2">
         <div className="col-12">
-          <div className="card border-0 shadow-lg">
-            <div className="card-header bg-transparent border-0 py-4">
+          <Card className="border-0 shadow-lg">
+            <Card.Header className="bg-transparent border-0 py-4">
               <h2 className="mb-0 fw-bold">Itens do Bundle</h2>
               <p className="text-muted mb-0 mt-2">
                 Todos os itens que você adquiriu neste bundle
               </p>
-            </div>
-            <div className="card-body p-4">
+            </Card.Header>
+            <Card.Body className="p-4">
               <div className="row g-4">
                 {bundle.cosmetics?.map((cosmetic) => (
                   <div key={cosmetic.externalId} className="col-xl-4 col-lg-6">
-                    <div
-                      className="card h-100 border-0 shadow-sm hover-shadow"
+                    <Card
+                      className="h-100 border-0 shadow-sm"
                       style={{
                         cursor: "pointer",
                         transition: "all 0.3s ease",
@@ -179,7 +225,7 @@ export const BundleHistoryDetails = () => {
                         e.currentTarget.style.transform = "translateY(0)";
                       }}
                     >
-                      <div className="card-body p-0">
+                      <Card.Body className="p-0">
                         <div className="d-flex">
                           {/* Imagem do Cosmético */}
                           <div
@@ -229,22 +275,21 @@ export const BundleHistoryDetails = () => {
                             </p>
 
                             <div className="d-flex justify-content-between align-items-center">
-                              <span
-                                className={`badge bg-${getRarityColor(
-                                  cosmetic.rarity
-                                )}`}
-                              >
+                              <Badge bg={getRarityColor(cosmetic.rarity)}>
                                 {cosmetic.rarity}
-                              </span>
+                              </Badge>
                               <div className="d-flex gap-1">
                                 {cosmetic.isNew && (
-                                  <span className="badge bg-success small">
+                                  <Badge bg="success" className="small">
                                     Novo
-                                  </span>
+                                  </Badge>
                                 )}
-                                <span className="badge bg-outline-secondary small text-capitalize">
+                                <Badge
+                                  bg="outline-secondary"
+                                  className="small text-capitalize"
+                                >
                                   {cosmetic.type}
-                                </span>
+                                </Badge>
                               </div>
                             </div>
 
@@ -255,15 +300,15 @@ export const BundleHistoryDetails = () => {
                             )}
                           </div>
                         </div>
-                      </div>
-                    </div>
+                      </Card.Body>
+                    </Card>
                   </div>
                 ))}
               </div>
-            </div>
-          </div>
+            </Card.Body>
+          </Card>
         </div>
       </div>
-    </div>
+    </Container>
   );
 };

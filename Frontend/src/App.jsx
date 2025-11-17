@@ -16,6 +16,7 @@ import { Profile } from "./components/Profile";
 import { UsersList } from "./components/UsersList";
 import { UserDetail } from "./components/UserDetail";
 import { BundleHistoryDetails } from "./components/BundleHistoryDetails";
+import { PurchaseHistory } from "./components/PurchaseHistory";
 
 function App() {
   return (
@@ -35,6 +36,7 @@ function App() {
             path="bundle-history/:bundleId"
             element={<BundleHistoryDetails />}
           />
+          <Route path="/purchase-history" element={<PurchaseHistory />} />
         </Routes>
       </main>
       <Footer />

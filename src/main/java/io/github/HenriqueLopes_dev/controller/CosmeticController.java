@@ -10,6 +10,7 @@ import io.github.HenriqueLopes_dev.service.CosmeticService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -64,6 +65,7 @@ public class CosmeticController implements GenericController{
     }
 
     @PostMapping("{bundleId}/purchase")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Object> purchase(@PathVariable String bundleId){
 
         Optional<CosmeticBundle> opBundle = service.purchaseBundleById(UUID.fromString(bundleId));

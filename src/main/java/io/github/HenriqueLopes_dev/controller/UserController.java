@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -59,6 +60,7 @@ public class UserController implements GenericController {
 
 
     @PutMapping("{id}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Object> update(@PathVariable String id,
                                          @RequestBody @Valid RegisterUserDTO dto){
 
@@ -79,6 +81,7 @@ public class UserController implements GenericController {
     }
 
     @DeleteMapping("{id}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<UserDTO> delete(@PathVariable String id){
 
         Optional<Userr> opUser = service.getUser(UUID.fromString(id));
@@ -112,6 +115,7 @@ public class UserController implements GenericController {
     }
 
     @GetMapping("{id}/purchase-history")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Page<PurchaseHistoryWithoutUserDTO>> getPurchaseHistory(
             @PathVariable String id,
             @RequestParam(value = "page", defaultValue = "0") Integer page,
@@ -155,7 +159,35 @@ public class UserController implements GenericController {
         return ResponseEntity.notFound().build();
     }
 
+    @GetMapping("{id}/purchase-history/{pHId}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<PurchaseHistoryWithoutUserDTO> getPurchaseHistory(
+            @PathVariable String id,
+            @PathVariable String pHId) {
+
+        Optional<Userr> opUser = service.getUser(UUID.fromString(id));
+
+        if (opUser.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Userr targetUser = opUser.get();
+
+        if (isOwner(targetUser.getId())) {
+            Optional<PurchaseHistory> opPH = service.getPurchaseHistoryByIdAndUser(UUID.fromString(pHId), targetUser);
+
+            if (opPH.isEmpty()){
+                return ResponseEntity.notFound().build();
+            }
+            PurchaseHistoryWithoutUserDTO dto = mapper.noUserToDTO(opPH.get());
+
+            return ResponseEntity.ok(dto);
+        }
+        return ResponseEntity.notFound().build();
+    }
+
     @PostMapping("me/acquired-cosmetics/{id}/refund")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Void> refund(@PathVariable String id) {
 
         Userr currentUser = getCurrentUser();
