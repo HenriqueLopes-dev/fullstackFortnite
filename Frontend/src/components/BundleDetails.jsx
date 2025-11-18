@@ -57,7 +57,7 @@ export const BundleDetails = () => {
   const handlePurchase = () => {
     if (!bundle) return;
     api.post(`cosmetics/${bundle.id}/purchase`);
-    window.location.reload(false);
+    navigate("/");
   };
 
   const hasDiscount = bundle?.finalPrice < bundle?.regularPrice;
