@@ -4,13 +4,12 @@ COPY pom.xml .
 COPY src ./src
 RUN mvn clean package -DskipTests
 
-# Etapa 2: Runtime
-FROM eclipse-temurin:21-jdk
+FROM eclipse-temurin:21-jre-jammy
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 
-# Expõe a porta
+ENV JAVA_OPTS="-Xmx512m -Xms256m -Dspring.profiles.active=prod -Dspring.main.lazy-initialization=true -Dserver.port=8080"
+
 EXPOSE 8080
 
-# Inicia a aplicação
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
