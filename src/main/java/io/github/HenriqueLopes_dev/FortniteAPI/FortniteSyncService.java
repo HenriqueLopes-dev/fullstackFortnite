@@ -31,7 +31,7 @@ public class FortniteSyncService {
     private final CosmeticBundleMapper bundleMapper;
 
     @Transactional
-    @Scheduled(fixedRate = THREE_HOUR_CLOCK)
+    @Scheduled(initialDelay = THREE_HOUR_CLOCK, fixedRate = THREE_HOUR_CLOCK)
     public void syncCosmetics() {
         System.out.println("[SYNC] Iniciando sincronização Fortnite...");
 
